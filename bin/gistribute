@@ -1,0 +1,75 @@
+#!/usr/bin/env ruby
+
+require "json"
+require "open-uri"
+require "colorize"
+require "nutella"
+
+print "Downloading data..."
+
+begin
+  # TODO: Let the user paste the entire Gist URL and parse out the ID.
+  gist = JSON.parse open("https://api.github.com/gists/#{ARGV.first}").read
+rescue OpenURI::HTTPError => msg
+  puts <<-EOS.heredoc.red
+
+
+    There was an error downloading the requested Gist.
+    The error is as follows:
+  EOS
+
+  puts msg
+
+  exit -1
+end
+
+# The JSON data contains a lot of information. The information that is
+# relevant to this program is as follows:
+#
+# {
+#   "html_url" => "Link to the Gist",
+#   "description" => "The description for the Gist",
+#
+#   "user" => nil, # IF ANONYMOUS
+#   "user" => {    # IF TIED TO A USER
+#     "login" => "username"
+#   },
+#
+#   "files" => {
+#     "filename of first file" => {
+#       "content" => "entire contents of the file"
+#     }
+#     # Repeat the above for every file in the Gist.
+#   }
+# }
+
+user = gist["user"] ? "user #{gist["user"]["login"]}" : "an anonymous user"
+
+puts <<-EOS.heredoc
+
+
+  Finished downloading Gist from: #{gist["html_url"]}
+  Gist uploaded by #{user}.
+
+  Beginning install...
+EOS
+
+gist["files"].each do |filename, data|
+  lines = data["content"].split "\n"
+
+  # Parse out all metadata after %% on the first two lines, strip out
+  # (lead|trail)ing whitespace while we're at it.
+  metadata = lines[0..1].map { |line| line[/%%\s*(.*\S)\s*/, 1] }
+
+  # Skip non-Gistribute files.
+  next if metadata.first.nil?
+
+  puts " #{"*".green} Installing #{metadata[1] || filename}..."
+
+  # TODO: Handle ~ better. Also, handle EOF newlines.
+  File.open(metadata.first.gsub(/~/, Dir.home), "w") do |f|
+    # Remove all lines with metadata- lines that don't match will return nil,
+    # so compact it and drop that many off the top of the file.
+    f << lines[metadata.compact.size..-1].join("\n")
+  end
+end
