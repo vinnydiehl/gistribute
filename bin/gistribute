@@ -16,14 +16,16 @@ begin
   # TODO: Let the user paste the entire Gist URL and parse out the ID.
   gist = JSON.parse open("https://api.github.com/gists/#{ARGV.first}").read
 rescue OpenURI::HTTPError => msg
-  puts <<-EOS.heredoc.red
+  print <<-EOS.heredoc.red
 
 
     There was an error downloading the requested Gist.
     The error is as follows:
   EOS
-
   puts msg
+
+  puts "The ID that was queried is:".red
+  puts id
 
   exit -1
 end
