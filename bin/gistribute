@@ -1,5 +1,10 @@
 #!/usr/bin/env ruby
 
+if %w[-v --version].include? ARGV.first
+  puts "Gistribute #{File.read(File.expand_path("../../VERSION", __FILE__)).strip}"
+  exit 0
+end
+
 require "json"
 require "open-uri"
 require "colorize"

@@ -15,7 +15,7 @@ Gem::Specification.new do |gem|
   gem.executables = %w[gistribute]
 
   gem.files = Dir["bin/**/*"] + %w[
-    LICENSE Rakefile README.md gistribute.gemspec
+    LICENSE Rakefile README.md VERSION gistribute.gemspec
   ]
 
   gem.add_dependency "json", "~> 1.7"
