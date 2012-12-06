@@ -43,13 +43,13 @@ end
 #   }
 # }
 
-user = gist["user"] ? "user #{gist["user"]["login"]}" : "an anonymous user"
-
 puts <<-EOS.heredoc
 
 
   Finished downloading Gist from: #{gist["html_url"]}
-  Gist uploaded by #{user}.
+  Gist uploaded by #{
+    gist["user"] ? "user #{gist["user"]["login"]}" : "an anonymous user"
+  }.
 
   Beginning install...
 EOS
