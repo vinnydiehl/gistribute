@@ -55,7 +55,7 @@ puts <<-EOS.heredoc
 EOS
 
 gist["files"].each do |filename, data|
-  lines = data["content"].split "\n"
+  lines = data["content"].lines.to_a
 
   # Parse out all metadata after %% on the first two lines, strip out
   # (lead|trail)ing whitespace while we're at it.
@@ -66,10 +66,10 @@ gist["files"].each do |filename, data|
 
   puts " #{"*".green} Installing #{metadata[1] || filename}..."
 
-  # TODO: Handle ~ better. Also, handle EOF newlines.
+  # TODO: Handle ~ better.
   File.open(metadata.first.gsub(/~/, Dir.home), "w") do |f|
     # Remove all lines with metadata- lines that don't match will return nil,
     # so compact it and drop that many off the top of the file.
-    f << lines[metadata.compact.size..-1].join("\n")
+    f << lines[metadata.compact.size..-1].join
   end
 end
