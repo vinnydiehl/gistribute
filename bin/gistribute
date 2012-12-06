@@ -66,8 +66,13 @@ gist["files"].each do |filename, data|
 
   puts " #{"*".green} Installing #{metadata[1] || filename}..."
 
-  # TODO: Handle ~ better.
-  File.open(metadata.first.gsub(/~/, Dir.home), "w") do |f|
+  # TODO: Is there a better way to handle ~?
+  path = metadata.first.gsub "~", Dir.home
+
+  # Handle directories that don't exist.
+  FileUtils.mkdir_p File.dirname(path)
+
+  File.open(path, "w") do |f|
     # Remove all lines with metadata- lines that don't match will return nil,
     # so compact it and drop that many off the top of the file.
     f << lines[metadata.compact.size..-1].join
