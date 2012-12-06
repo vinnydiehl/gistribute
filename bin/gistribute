@@ -12,9 +12,11 @@ require "nutella"
 
 print "Downloading data..."
 
+# The user can paste in either just the ID or the entire URL to the Gist.
+id = ARGV.first[/(^|\/)([[:xdigit:]]+)/, 2]
+
 begin
-  # TODO: Let the user paste the entire Gist URL and parse out the ID.
-  gist = JSON.parse open("https://api.github.com/gists/#{ARGV.first}").read
+  gist = JSON.parse open("https://api.github.com/gists/#{id}").read
 rescue OpenURI::HTTPError => msg
   print <<-EOS.heredoc.red
 
