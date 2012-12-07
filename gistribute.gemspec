@@ -19,6 +19,5 @@ Gem::Specification.new do |gem|
   ]
 
   gem.add_dependency "json", "~> 1.7"
-  gem.add_dependency "nutella", "~> 0.10"
-  gem.add_dependency "colorize", "~> 0.5"
+  gem.add_dependency "nutella", "~> 0.11"
 end

@@ -7,7 +7,6 @@ end
 
 require "json"
 require "open-uri"
-require "colorize"
 require "nutella"
 
 print "Downloading data..."
