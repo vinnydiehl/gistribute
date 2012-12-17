@@ -6,12 +6,13 @@ if %w[-v --version].include? ARGV.first
 end
 
 require "json"
+require "fileutils"
 require "open-uri"
 require "nutella"
 
 print "Downloading data..."
 
-# The user can paste in either just the ID or the entire URL to the Gist.
+# The user can pass in either just the ID or the entire URL to the Gist.
 id = ARGV.first[/(^|\/)([[:xdigit:]]+)/, 2]
 
 begin
@@ -51,38 +52,35 @@ end
 #   }
 # }
 
-puts <<-EOS.heredoc
+# Regular expression word wrap to keep lines less than 80 characters. Then
+# check to see if it's empty- if not, put newlines on each side so that it
+# will be padded when displayed in the output.
+desc = gist["description"].gsub(/(.{1,79})(\s+|\Z)/, "\\1\n").strip
+desc = "\n#{desc}\n" unless desc.empty?
 
-
-  Finished downloading Gist from: #{gist["html_url"]}
-  Gist uploaded by #{
-    gist["user"] ? "user #{gist["user"]["login"]}" : "an anonymous user"
-  }.
-
-  Beginning install...
+puts <<-EOS
+\n
+Finished downloading Gist from: #{gist["html_url"]}
+Gist uploaded by #{
+  gist["user"] ? "user #{gist["user"]["login"]}" : "an anonymous user"
+}.
+#{desc}
+Beginning install...
 EOS
 
 gist["files"].each do |filename, data|
-  lines = data["content"].lines.to_a
+  metadata = filename.split "||"
 
-  # Parse out all metadata after %% on the first two lines, strip out
-  # (lead|trail)ing whitespace while we're at it.
-  metadata = lines[0..1].map { |line| line[/%%\s*(.*\S)\s*/, 1] }
+  # | as path separator in the Gist's file name, as Gist doesn't allow the
+  # usage of /.
+  path = metadata.last.gsub /[~|]/, "|" => "/", "~" => Dir.home
+  # Default description is the name of the file.
+  description = metadata.size == 1 ? File.basename(path) : metadata.first
 
-  # Skip non-Gistribute files.
-  next if metadata.first.nil?
-
-  puts " #{"*".green} Installing #{metadata[1] || filename}..."
-
-  # TODO: Is there a better way to handle ~?
-  path = metadata.first.gsub "~", Dir.home
+  puts " #{"*".green} Installing #{description}..."
 
   # Handle directories that don't exist.
   FileUtils.mkdir_p File.dirname(path)
 
-  File.open(path, "w") do |f|
-    # Remove all lines with metadata- lines that don't match will return nil,
-    # so compact it and drop that many off the top of the file.
-    f << lines[metadata.compact.size..-1].join
-  end
+  File.write path, data["content"]
 end
