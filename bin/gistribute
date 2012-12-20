@@ -69,7 +69,7 @@ Beginning install...
 EOS
 
 gist["files"].each do |filename, data|
-  metadata = filename.split "||"
+  metadata = filename.split("||").map &:strip
 
   # | as path separator in the Gist's file name, as Gist doesn't allow the
   # usage of /.
