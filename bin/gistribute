@@ -58,7 +58,7 @@ end
 desc = gist["description"].gsub(/(.{1,79})(\s+|\Z)/, "\\1\n").strip
 desc = "\n#{desc}\n" unless desc.empty?
 
-puts <<-EOS
+puts <<EOS
 \n
 Finished downloading Gist from: #{gist["html_url"]}
 Gist uploaded by #{
