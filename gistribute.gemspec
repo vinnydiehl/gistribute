@@ -4,7 +4,7 @@ Gem::Specification.new do |gem|
 
   gem.author = "Vinny Diehl"
   gem.email = "vinny.diehl@gmail.com"
-  gem.homepage = "https://github.com/gbchaosmaster/gistribute"
+  gem.homepage = "https://github.com/vinnydiehl/gistribute"
 
   gem.license = "MIT"
 
@@ -13,11 +13,10 @@ Gem::Specification.new do |gem|
 
   gem.bindir = "bin"
   gem.executables = %w[gistribute]
+  gem.test_files = Dir["spec/**/*"]
+  gem.files = `git ls-files -z`.split "\x0"
 
-  gem.files = Dir["bin/**/*"] + %w[
-    LICENSE Rakefile README.md VERSION gistribute.gemspec
-  ]
-
-  gem.add_dependency "json", "~> 1.7"
-  gem.add_dependency "nutella", "~> 0.11"
+  gem.add_dependency "colorize", "~> 1.0"
+  gem.add_development_dependency "fuubar", "~> 2.0"
+  gem.add_development_dependency "rspec", "~> 3.12"
 end

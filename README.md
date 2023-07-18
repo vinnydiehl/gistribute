@@ -11,7 +11,9 @@ a tweak to one of the files that you're sharing.
 
 ## Installation
 
-    $ gem install gistribute
+```sh
+gem install gistribute
+```
 
 ## How It Works
 
@@ -38,7 +40,7 @@ If the resulting Gist link was, for example, https://gist.github.com/123456,
 the user would be able to run either of these commands to download the file
 to `~/.vimrc`:
 
-```Shell
-$ gistribute 123456
-$ gistribute https://gist.github.com/123456
+```sh
+gistribute 123456
+gistribute https://gist.github.com/123456
 ```

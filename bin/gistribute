@@ -1,14 +1,17 @@
 #!/usr/bin/env ruby
 
+require "colorize"
+require "fileutils"
+require "json"
+require "open-uri"
+
+# Print to STDOUT to clear line
+CLEAR = "\r\e[K"
+
 if %w[-v --version].include? ARGV.first
   puts "Gistribute #{File.read(File.expand_path("../../VERSION", __FILE__)).strip}"
   exit 0
 end
-
-require "json"
-require "fileutils"
-require "open-uri"
-require "nutella"
 
 print "Downloading data..."
 
@@ -16,12 +19,10 @@ print "Downloading data..."
 id = ARGV.first[/(^|\/)([[:xdigit:]]+)/, 2]
 
 begin
-  gist = JSON.parse open("https://api.github.com/gists/#{id}").read
+  gist = JSON.parse(URI.open("https://api.github.com/gists/#{id}").read)
 rescue OpenURI::HTTPError => msg
-  print <<-EOS.heredoc.red
-
-
-    There was an error downloading the requested Gist.
+  print <<~EOS.red
+    #{CLEAR}There was an error downloading the requested Gist.
     The error is as follows:
   EOS
   puts msg
@@ -39,8 +40,8 @@ end
 #   "html_url" => "Link to the Gist",
 #   "description" => "The description for the Gist",
 #
-#   "user" => nil, # IF ANONYMOUS
-#   "user" => {    # IF TIED TO A USER
+#   "owner" => nil, # IF ANONYMOUS
+#   "owner" => {    # IF TIED TO A USER
 #     "login" => "username"
 #   },
 #
@@ -58,14 +59,13 @@ end
 desc = gist["description"].gsub(/(.{1,79})(\s+|\Z)/, "\\1\n").strip
 desc = "\n#{desc}\n" unless desc.empty?
 
-puts <<EOS
-\n
-Finished downloading Gist from: #{gist["html_url"]}
-Gist uploaded by #{
-  gist["user"] ? "user #{gist["user"]["login"]}" : "an anonymous user"
-}.
-#{desc}
-Beginning install...
+puts <<~EOS
+  #{CLEAR}Finished downloading Gist from: #{gist["html_url"]}
+  Gist uploaded by #{
+    gist["owner"] ? "user #{gist["owner"]["login"]}" : "an anonymous user"
+  }.
+  #{desc}
+  Beginning install...
 EOS
 
 gist["files"].each do |filename, data|
@@ -73,7 +73,7 @@ gist["files"].each do |filename, data|
 
   # | as path separator in the Gist's file name, as Gist doesn't allow the
   # usage of /.
-  path = metadata.last.gsub /[~|]/, "|" => "/", "~" => Dir.home
+  path = metadata.last.gsub(/[~|]/, "|" => "/", "~" => Dir.home)
   # Default description is the name of the file.
   description = metadata.size == 1 ? File.basename(path) : metadata.first
 
@@ -82,5 +82,5 @@ gist["files"].each do |filename, data|
   # Handle directories that don't exist.
   FileUtils.mkdir_p File.dirname(path)
 
-  File.write path, data["content"]
+  File.write(path, data["content"])
 end
