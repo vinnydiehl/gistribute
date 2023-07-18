@@ -30,7 +30,7 @@ rescue OpenURI::HTTPError => msg
   puts "The ID that was queried is:".red
   puts id
 
-  exit -1
+  exit 1
 end
 
 # The JSON data contains a lot of information. The information that is
