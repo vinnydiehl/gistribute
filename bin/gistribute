@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
 
 require "colorize"
 require "fileutils"
@@ -9,23 +10,23 @@ require "open-uri"
 CLEAR = "\r\e[K"
 
 if %w[-v --version].include? ARGV.first
-  puts "Gistribute #{File.read(File.expand_path("../../VERSION", __FILE__)).strip}"
+  puts "Gistribute #{File.read(File.expand_path('../VERSION', __dir__)).strip}"
   exit 0
 end
 
 print "Downloading data..."
 
 # The user can pass in either just the ID or the entire URL to the Gist.
-id = ARGV.first[/(^|\/)([[:xdigit:]]+)/, 2]
+id = ARGV.first[%r{(^|/)([[:xdigit:]]+)}, 2]
 
 begin
   gist = JSON.parse(URI.open("https://api.github.com/gists/#{id}").read)
-rescue OpenURI::HTTPError => msg
+rescue OpenURI::HTTPError => e
   print <<~EOS.red
     #{CLEAR}There was an error downloading the requested Gist.
     The error is as follows:
   EOS
-  puts msg
+  puts e
 
   puts "The ID that was queried is:".red
   puts id
@@ -60,16 +61,16 @@ desc = gist["description"].gsub(/(.{1,79})(\s+|\Z)/, "\\1\n").strip
 desc = "\n#{desc}\n" unless desc.empty?
 
 puts <<~EOS
-  #{CLEAR}Finished downloading Gist from: #{gist["html_url"]}
+  #{CLEAR}Finished downloading Gist from: #{gist['html_url']}
   Gist uploaded by #{
-    gist["owner"] ? "user #{gist["owner"]["login"]}" : "an anonymous user"
+    gist['owner'] ? "user #{gist['owner']['login']}" : 'an anonymous user'
   }.
   #{desc}
   Beginning install...
 EOS
 
 gist["files"].each do |filename, data|
-  metadata = filename.split("||").map &:strip
+  metadata = filename.split("||").map(&:strip)
 
   # | as path separator in the Gist's file name, as Gist doesn't allow the
   # usage of /.
@@ -77,7 +78,7 @@ gist["files"].each do |filename, data|
   # Default description is the name of the file.
   description = metadata.size == 1 ? File.basename(path) : metadata.first
 
-  puts " #{"*".green} Installing #{description}..."
+  puts " #{'*'.green} Installing #{description}..."
 
   # Handle directories that don't exist.
   FileUtils.mkdir_p File.dirname(path)
