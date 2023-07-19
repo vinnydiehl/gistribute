@@ -15,5 +15,5 @@ def args_should_trigger_help_screen(*args)
 end
 
 def suppress_stdout
-  $stdout.stub(:write)
+  allow($stdout).to receive(:write)
 end
