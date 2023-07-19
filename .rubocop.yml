@@ -25,6 +25,9 @@ Layout/FirstHashElementIndentation:
 Layout/SpaceAroundEqualsInParameterDefault:
   Enabled: false
 
+Lint/NonDeterministicRequireOrder:
+  Enabled: false
+
 Metrics:
   Enabled: false
 

@@ -33,14 +33,14 @@ module Gistribute
       begin
         gist = JSON.parse(URI.open("https://api.github.com/gists/#{id}").read)
       rescue OpenURI::HTTPError => e
-        print <<~EOS.red
+        $stderr.print <<~EOS.red
           \rThere was an error downloading the requested Gist.
           The error is as follows:
         EOS
-        puts e
+        warn e
 
-        puts "The ID that was queried is:".red
-        puts id
+        warn "The ID that was queried is:".red
+        warn id
 
         exit 1
       end

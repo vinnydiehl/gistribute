@@ -17,3 +17,9 @@ end
 def suppress_stdout
   allow($stdout).to receive(:write)
 end
+
+def silent_run(*args)
+  suppress_stdout
+  set_argv(*args)
+  cli.run
+end

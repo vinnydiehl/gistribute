@@ -3,7 +3,7 @@
 require "gistribute"
 
 # Include all files in spec/support
-Dir[File.expand_path("support/**/*.rb", __dir__)].sort.each { |f| require f }
+Dir[File.expand_path("support/**/*.rb", __dir__)].each { |f| require f }
 
 RSpec.configure do |config|
   # Add `focus: true` hash parameter to a describe/context/it block
