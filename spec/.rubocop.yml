@@ -18,10 +18,6 @@ Lint/AmbiguousBlockAssociation:
 RSpec/ContextWording:
   Enabled: false
 
-# This is disabled until I refactor the app into a proper class structure
-RSpec/DescribeClass:
-  Enabled: false
-
 RSpec/EmptyExampleGroup:
   Enabled: false
 
