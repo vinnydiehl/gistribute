@@ -22,7 +22,7 @@ describe "gistribute" do
   %w[--version -v].each do |flag|
     context "with the #{flag} flag" do
       it "outputs the version" do
-        expect(`gistribute #{flag}`).to eq "Gistribute #{version}\n"
+        expect(`gistribute #{flag}`).to eq "gistribute #{version}\n"
       end
     end
   end

@@ -19,6 +19,8 @@ Gem::Specification.new do |gem|
   gem.files = `git ls-files -z`.split "\x0"
 
   gem.add_dependency "colorize", "~> 1.0"
+  gem.add_dependency "optimist", "~> 3.0"
+
   gem.add_development_dependency "fuubar", "~> 2.0"
   gem.add_development_dependency "rspec", "~> 3.12"
   gem.add_development_dependency "rubocop", "~> 1.54"

@@ -5,14 +5,21 @@ require "colorize"
 require "fileutils"
 require "json"
 require "open-uri"
+require "optimist"
 
-# Print to STDOUT to clear line
-CLEAR = "\r\e[K"
+options = Optimist::options do
+  version "gistribute #{File.read(File.expand_path('../VERSION', __dir__)).strip}"
+  banner self.version
+  banner "Usage: gistribute [OPTIONS] URL_OR_ID"
 
-if %w[-v --version].include? ARGV.first
-  puts "Gistribute #{File.read(File.expand_path('../VERSION', __dir__)).strip}"
-  exit 0
+  banner "\nOptions:"
+  opt :version, "display version number"
+  opt :help, "display this message"
+
+  educate_on_error
 end
+
+Optimist::educate if ARGV.length != 1
 
 print "Downloading data..."
 
@@ -23,7 +30,7 @@ begin
   gist = JSON.parse(URI.open("https://api.github.com/gists/#{id}").read)
 rescue OpenURI::HTTPError => e
   print <<~EOS.red
-    #{CLEAR}There was an error downloading the requested Gist.
+    \rThere was an error downloading the requested Gist.
     The error is as follows:
   EOS
   puts e
@@ -61,7 +68,7 @@ desc = gist["description"].gsub(/(.{1,79})(\s+|\Z)/, "\\1\n").strip
 desc = "\n#{desc}\n" unless desc.empty?
 
 puts <<~EOS
-  #{CLEAR}Finished downloading Gist from: #{gist['html_url']}
+  \rFinished downloading Gist from: #{gist['html_url']}
   Gist uploaded by #{
     gist['owner'] ? "user #{gist['owner']['login']}" : 'an anonymous user'
   }.
