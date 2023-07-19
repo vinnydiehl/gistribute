@@ -14,12 +14,14 @@ def args_should_trigger_help_screen(*args)
   end
 end
 
-def suppress_stdout
+def silent_run(*args, fail_on_exit: true)
   allow($stdout).to receive(:write)
-end
 
-def silent_run(*args)
-  suppress_stdout
   set_argv(*args)
-  cli.run
+
+  begin
+    cli.run
+  rescue SystemExit
+    fail "unexpected exit" if fail_on_exit
+  end
 end

@@ -76,5 +76,26 @@ describe Gistribute::CLI do
         expect(file_contents).to eq SINGLE_FILE_CONTENTS
       end
     end
+
+    context "when given a bad ID (404)" do
+      before do
+        %i[puts print].each { |p| allow($stderr).to receive p }
+        silent_run "bad", fail_on_exit: false
+      end
+
+      it "prints the error to STDERR" do
+        expect($stderr).to have_received(:print).with <<~EOS.red
+          \rThere was an error downloading the requested Gist.
+          The error is as follows:
+        EOS
+
+        expect($stderr).to have_received(:puts)
+          .with(an_instance_of(OpenURI::HTTPError)
+          .and(have_attributes(message: "404 Not Found")))
+
+        expect($stderr).to have_received(:puts).with("The ID that was queried is:".red)
+        expect($stderr).to have_received(:puts).with("bad")
+      end
+    end
   end
 end

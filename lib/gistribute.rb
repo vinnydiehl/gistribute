@@ -37,10 +37,10 @@ module Gistribute
           \rThere was an error downloading the requested Gist.
           The error is as follows:
         EOS
-        warn e
+        $stderr.puts e
 
-        warn "The ID that was queried is:".red
-        warn id
+        $stderr.puts "The ID that was queried is:".red
+        $stderr.puts id
 
         exit 1
       end
