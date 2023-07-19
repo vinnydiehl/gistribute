@@ -16,6 +16,9 @@ Layout/ArgumentAlignment:
 Layout/DotPosition:
   Enabled: false
 
+Layout/EndAlignment:
+  EnforcedStyleAlignWith: variable
+
 Layout/ExtraSpacing:
   Enabled: false
 

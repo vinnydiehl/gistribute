@@ -19,6 +19,9 @@ Gem::Specification.new do |gem|
   gem.files = `git ls-files -z`.split "\x0"
 
   gem.add_dependency "colorize", "~> 1.0"
+  gem.add_dependency "faraday-retry", "~> 2.2"
+  gem.add_dependency "launchy", "~> 2.5"
+  gem.add_dependency "octokit", "~> 6.1"
   gem.add_dependency "optimist", "~> 3.0"
 
   gem.add_development_dependency "fuubar", "~> 2.0"
