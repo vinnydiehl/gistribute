@@ -5,7 +5,12 @@ require "spec_helper"
 require "fileutils"
 
 describe Gistribute::CLI do
-  before { FileUtils.mkdir_p TEMP }
+  before do
+    FileUtils.mkdir_p TEMP
+    suppress_stdout
+    setup_auth
+  end
+
   after { FileUtils.rm_rf TEMP }
 
   let(:cli) { described_class.new }
@@ -32,7 +37,7 @@ describe Gistribute::CLI do
       "no || spacing": NO_PIPE_SPACING_ID
     }.each do |description, id|
       context "when run with a #{description} Gist" do
-        before { silent_run id }
+        before { run id }
 
         let(:file_contents) { File.read "#{TEMP}/#{FILENAME}" }
 
@@ -43,7 +48,7 @@ describe Gistribute::CLI do
     end
 
     context "when given a directory that doesn't exist" do
-      before { silent_run NON_EXISTENT_DIR_ID }
+      before { run NON_EXISTENT_DIR_ID }
 
       let(:file_contents) { File.read "#{TEMP}/#{NEW_DIR_FILENAME}" }
 
@@ -53,7 +58,7 @@ describe Gistribute::CLI do
     end
 
     context "when run with a multi-file Gist" do
-      before { silent_run MULTI_FILE_ID }
+      before { run MULTI_FILE_ID }
 
       let(:file1_contents) { File.read "#{TEMP}/#{MULTI_FILENAMES[0]}" }
       let(:file2_contents) { File.read "#{TEMP}/#{MULTI_FILENAMES[1]}" }
@@ -67,7 +72,7 @@ describe Gistribute::CLI do
     end
 
     context "when given a file for the current working directory" do
-      before { silent_run CWD_ID }
+      before { run CWD_ID }
       after { FileUtils.rm "#{Dir.pwd}/#{FILENAME}" }
 
       let(:file_contents) { File.read "#{Dir.pwd}/#{FILENAME}" }
@@ -80,7 +85,7 @@ describe Gistribute::CLI do
     context "when given a bad ID (404)" do
       before do
         %i[puts print].each { |p| allow($stderr).to receive p }
-        silent_run "bad", fail_on_exit: false
+        run "bad", fail_on_exit: false
       end
 
       it "prints the error to STDERR" do

@@ -5,6 +5,8 @@ name: Test
 jobs:
   test:
     runs-on: ubuntu-latest
+    env:
+      GISTRIBUTE_TEST_OAUTH_TOKEN: ${{ secrets.GISTRIBUTE_TEST_OAUTH_TOKEN }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -13,5 +15,7 @@ jobs:
         with:
           ruby-version: 3.2
           bundler-cache: true
+      - name: Check for focused tests
+        run: bundle exec rubocop --only RSpec/Focus
       - name: Run tests
         run: bundle exec rspec --format doc
