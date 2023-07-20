@@ -79,6 +79,17 @@ describe Gistribute::CLI do
       end
     end
 
+    context "when given a file for the home directory" do
+      before { run HOME_ID }
+      after { FileUtils.rm "#{Dir.home}/#{FILENAME}" }
+
+      let(:file_contents) { File.read "#{Dir.home}/#{FILENAME}" }
+
+      it "downloads the file into the home directory" do
+        expect(file_contents).to eq SINGLE_FILE_CONTENTS
+      end
+    end
+
     context "when given a bad ID (404)" do
       before do
         %i[puts print].each { |p| allow($stderr).to receive p }
