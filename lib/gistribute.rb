@@ -19,6 +19,7 @@ module Gistribute
         banner "Usage: gistribute [OPTIONS] URL_OR_ID"
 
         banner "\nOptions:"
+        opt :yes, "install files without prompting"
         opt :version, "display version number"
         opt :help, "display this message"
 
@@ -106,18 +107,11 @@ module Gistribute
       # Regular expression word wrap to keep lines less than 80 characters. Then
       # check to see if it's empty- if not, put newlines on each side so that it
       # will be padded when displayed in the output.
-      desc = gist.description.gsub(/(.{1,79})(\s+|\Z)/, "\\1\n").strip
-      desc = "\n#{desc}\n" unless desc.empty?
+      gist_description = gist.description.gsub(/(.{1,79})(\s+|\Z)/, "\\1\n").strip
+      gist_description = "\n#{gist_description}\n" unless gist_description.empty?
 
-      puts <<~EOS
-        \rFinished downloading Gist from: #{gist['html_url']}
-        Gist uploaded by #{
-          gist.owner ? "user #{gist.owner[:login]}" : 'an anonymous user'
-        }.
-        #{desc}
-      EOS
-
-      gist.files.each do |filename, data|
+      # Process files
+      files = gist.files.map do |filename, data|
         metadata = filename.to_s.split("||").map(&:strip)
 
         # | as path separator in the Gist's file name, as Gist doesn't allow the
@@ -126,12 +120,48 @@ module Gistribute
         # Default description is the name of the file.
         description = metadata.size == 1 ? File.basename(path) : metadata.first
 
-        # Handle directories that don't exist.
-        FileUtils.mkdir_p File.dirname(path)
-        File.write(path, data[:content])
-
-        puts " #{'*'.green} #{description} installed."
+        { description:, path:, content: data[:content] }
       end
+
+      puts <<~EOS
+        \rFinished downloading Gist from: #{gist.html_url}
+        Gist uploaded by #{
+          gist.owner ? "user #{gist.owner[:login]}" : 'an anonymous user'
+        }.
+        #{gist_description}
+      EOS
+
+      unless @options.yes
+        puts "Files:"
+
+        files.each do |f|
+          print "#{f[:description]}: " unless f[:description].empty?
+          puts f[:path]
+        end
+      end
+
+      if @options.yes || confirm?("\nWould you like to install these files? [Yn] ")
+        puts unless @options.yes
+
+        files.each do |f|
+          # Handle directories that don't exist.
+          FileUtils.mkdir_p File.dirname(f[:path])
+          File.write(f[:path], f[:content])
+
+          # If using `--yes`, we print the path in the this string rather than
+          # above with the prompt
+          puts " #{'*'.green} #{f[:description]} installed#{
+            @options.yes ? " to: #{f[:path]}" : '.'
+          }"
+        end
+      end
+    end
+
+    def confirm?(prompt)
+      print prompt
+      input = $stdin.gets.strip.downcase
+
+      input.start_with?("y") || input.empty?
     end
 
     # Prints an error message and exits the program.
