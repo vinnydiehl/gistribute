@@ -2,10 +2,9 @@
 
 require "colorize"
 require "fileutils"
-require "json" ################################### TODO: is this necessary after this branch merges?
+require "json"
 require "launchy"
 require "octokit"
-require "open-uri"
 require "optimist"
 
 CLIENT_ID = "3f37dc8255e5ab891c3d"
@@ -86,61 +85,40 @@ module Gistribute
     def run
       print "Downloading data..."
 
-      # The user can pass in either just the ID or the entire URL to the Gist.
       id = Gistribute.parse_id(ARGV.first)
 
       begin
-        gist = JSON.parse(URI.open("https://api.github.com/gists/#{id}").read)
-      rescue OpenURI::HTTPError => e
-        $stderr.print <<~EOS.red
+        gist = @client.gist(id)
+      rescue Octokit::Error => e
+        $stderr.print <<~EOS.chop.red
           \rThere was an error downloading the requested Gist.
           The error is as follows:
         EOS
-        $stderr.puts e
+        $stderr.puts " #{e.response_status} #{JSON.parse(e.response_body)['message']}"
 
-        $stderr.puts "The ID that was queried is:".red
+        $stderr.print "The ID that was queried is: ".red
         $stderr.puts id
 
         exit 1
       end
 
-      # The JSON data contains a lot of information. The information that is
-      # relevant to this program is as follows:
-      #
-      # {
-      #   "html_url" => "Link to the Gist",
-      #   "description" => "The description for the Gist",
-      #
-      #   "owner" => nil, # IF ANONYMOUS
-      #   "owner" => {    # IF TIED TO A USER
-      #     "login" => "username"
-      #   },
-      #
-      #   "files" => {
-      #     "filename of first file" => {
-      #       "content" => "entire contents of the file"
-      #     }
-      #     # Repeat the above for every file in the Gist.
-      #   }
-      # }
-
       # Regular expression word wrap to keep lines less than 80 characters. Then
       # check to see if it's empty- if not, put newlines on each side so that it
       # will be padded when displayed in the output.
-      desc = gist["description"].gsub(/(.{1,79})(\s+|\Z)/, "\\1\n").strip
+      desc = gist.description.gsub(/(.{1,79})(\s+|\Z)/, "\\1\n").strip
       desc = "\n#{desc}\n" unless desc.empty?
 
       puts <<~EOS
         \rFinished downloading Gist from: #{gist['html_url']}
         Gist uploaded by #{
-          gist['owner'] ? "user #{gist['owner']['login']}" : 'an anonymous user'
+          gist.owner ? "user #{gist.owner[:login]}" : 'an anonymous user'
         }.
         #{desc}
         Beginning install...
       EOS
 
-      gist["files"].each do |filename, data|
-        metadata = filename.split("||").map(&:strip)
+      gist.files.each do |filename, data|
+        metadata = filename.to_s.split("||").map(&:strip)
 
         # | as path separator in the Gist's file name, as Gist doesn't allow the
         # usage of /.
@@ -153,16 +131,19 @@ module Gistribute
         # Handle directories that don't exist.
         FileUtils.mkdir_p File.dirname(path)
 
-        File.write(path, data["content"])
+        File.write(path, data[:content])
       end
     end
 
+    # Prints an error message and exits the program.
     def exit_error(code, message)
       $stderr.puts "#{'Error'.red}: #{message}"
       exit code
     end
   end
 
+  # The user may enter either the full URL or just the ID, this function
+  # will parse it out of the input.
   def self.parse_id(str)
     str[%r{(^|/)([[:xdigit:]]+)}, 2]
   end

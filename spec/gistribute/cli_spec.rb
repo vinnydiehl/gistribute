@@ -86,16 +86,13 @@ describe Gistribute::CLI do
       end
 
       it "prints the error to STDERR" do
-        expect($stderr).to have_received(:print).with <<~EOS.red
+        expect($stderr).to have_received(:print).with <<~EOS.chop.red
           \rThere was an error downloading the requested Gist.
           The error is as follows:
         EOS
 
-        expect($stderr).to have_received(:puts)
-          .with(an_instance_of(OpenURI::HTTPError)
-          .and(have_attributes(message: "404 Not Found")))
-
-        expect($stderr).to have_received(:puts).with("The ID that was queried is:".red)
+        expect($stderr).to have_received(:puts).with(" 404 Not Found")
+        expect($stderr).to have_received(:print).with("The ID that was queried is: ".red)
         expect($stderr).to have_received(:puts).with("bad")
       end
     end
