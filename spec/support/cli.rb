@@ -27,3 +27,18 @@ def args_should_trigger_help_screen(*args)
     expect(Optimist).to have_received :educate
   end
 end
+
+def test_single_file(id, path)
+  before { run id }
+
+  # TEMP already gets `rm -rf`ed in the `cli_spec.rb` #after
+  unless path == TEMP
+    after { FileUtils.rm "#{path}/#{FILENAME}" }
+  end
+
+  let(:file_contents) { File.read "#{path}/#{FILENAME}" }
+
+  it "downloads the file into #{path}" do
+    expect(file_contents).to eq SINGLE_FILE_CONTENTS
+  end
+end

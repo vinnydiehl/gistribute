@@ -34,13 +34,7 @@ describe Gistribute::CLI do
       "no || spacing": NO_PIPE_SPACING_ID
     }.each do |description, id|
       context "when run with a #{description} Gist" do
-        before { run id }
-
-        let(:file_contents) { File.read "#{TEMP}/#{FILENAME}" }
-
-        it "downloads the file into #{TEMP}" do
-          expect(file_contents).to eq SINGLE_FILE_CONTENTS
-        end
+        test_single_file id, TEMP
       end
     end
 
@@ -69,25 +63,11 @@ describe Gistribute::CLI do
     end
 
     context "when given a file for the current working directory" do
-      before { run CWD_ID }
-      after { FileUtils.rm "#{Dir.pwd}/#{FILENAME}" }
-
-      let(:file_contents) { File.read "#{Dir.pwd}/#{FILENAME}" }
-
-      it "downloads the file into the current working directory" do
-        expect(file_contents).to eq SINGLE_FILE_CONTENTS
-      end
+      test_single_file CWD_ID, Dir.pwd
     end
 
     context "when given a file for the home directory" do
-      before { run HOME_ID }
-      after { FileUtils.rm "#{Dir.home}/#{FILENAME}" }
-
-      let(:file_contents) { File.read "#{Dir.home}/#{FILENAME}" }
-
-      it "downloads the file into the home directory" do
-        expect(file_contents).to eq SINGLE_FILE_CONTENTS
-      end
+      test_single_file HOME_ID, Dir.home
     end
 
     context "when given a bad ID (404)" do
