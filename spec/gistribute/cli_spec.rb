@@ -8,12 +8,9 @@ describe Gistribute::CLI do
   before do
     FileUtils.mkdir_p TEMP
     suppress_stdout
-    setup_auth
   end
 
   after { FileUtils.rm_rf TEMP }
-
-  let(:cli) { described_class.new }
 
   let :version do
     File.read(File.expand_path("../VERSION", __dir__)).strip
