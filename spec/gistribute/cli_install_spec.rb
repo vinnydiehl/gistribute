@@ -45,7 +45,7 @@ describe Gistribute::CLI do
 
   describe "#install" do
     context "when user inputs `y` at the installation prompt" do
-      before { allow($stdin).to receive(:gets).and_return "y" }
+      before { simulate_user_input "y\n" }
 
       {
         "public single file": PUB_SINGLE_FILE_ID,
@@ -111,7 +111,7 @@ describe Gistribute::CLI do
 
     context "when user inputs nothing at the installation prompt" do
       before do
-        allow($stdin).to receive(:gets).and_return "\n"
+        simulate_user_input "\n"
         run PUB_SINGLE_FILE_ID
       end
 
@@ -123,7 +123,7 @@ describe Gistribute::CLI do
     %w[n m].each do |ch|
       context "when user inputs `#{ch}` at the installation prompt" do
         before do
-          allow($stdin).to receive(:gets).and_return ch
+          simulate_user_input "#{ch}\n"
           run PUB_SINGLE_FILE_ID
         end
 
