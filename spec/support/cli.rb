@@ -1,11 +1,5 @@
 # frozen_string_literal: true
 
-def setup_auth
-  unless File.exist?(CONFIG_FILE)
-    File.write(CONFIG_FILE, ENV.fetch("GISTRIBUTE_TEST_OAUTH_TOKEN"))
-  end
-end
-
 def suppress_stdout
   allow($stdout).to receive(:write)
 end
@@ -18,7 +12,7 @@ def run(*args, fail_on_exit: true)
   set_argv(*args)
 
   begin
-    cli.run
+    Gistribute::CLI.new.run
   rescue SystemExit
     fail "unexpected exit" if fail_on_exit
   end

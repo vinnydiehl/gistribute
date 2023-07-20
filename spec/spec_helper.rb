@@ -2,6 +2,14 @@
 
 require "gistribute"
 
+# Get OAuth token from environment if there is none
+unless File.exist?(CONFIG_FILE)
+  File.write(CONFIG_FILE, ENV.fetch("GISTRIBUTE_TEST_OAUTH_TOKEN"))
+end
+
+# Yes, this could be leaked in CI, but it's just a gist scoped token for a dummy account
+OAUTH_TOKEN = File.read(CONFIG_FILE).freeze
+
 # Include all files in spec/support
 Dir[File.expand_path("support/**/*.rb", __dir__)].each { |f| require f }
 
