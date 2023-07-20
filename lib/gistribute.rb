@@ -80,6 +80,7 @@ module Gistribute
 
       @client = Octokit::Client.new(access_token:)
       puts "Logged in as #{@client.user.login}."
+      puts
     end
 
     def run
@@ -114,7 +115,6 @@ module Gistribute
           gist.owner ? "user #{gist.owner[:login]}" : 'an anonymous user'
         }.
         #{desc}
-        Beginning install...
       EOS
 
       gist.files.each do |filename, data|
@@ -126,12 +126,11 @@ module Gistribute
         # Default description is the name of the file.
         description = metadata.size == 1 ? File.basename(path) : metadata.first
 
-        puts " #{'*'.green} Installing #{description}..."
-
         # Handle directories that don't exist.
         FileUtils.mkdir_p File.dirname(path)
-
         File.write(path, data[:content])
+
+        puts " #{'*'.green} #{description} installed."
       end
     end
 
