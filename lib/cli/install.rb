@@ -72,6 +72,8 @@ module Gistribute
             @options.yes ? " to: #{f[:path]}" : '.'
           }"
         end
+      else
+        puts "Aborting.".red
       end
     end
   end
