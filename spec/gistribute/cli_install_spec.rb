@@ -2,8 +2,6 @@
 
 require "spec_helper"
 
-TEMP = "/tmp/gistribute_spec"
-FILENAME = "test.file"
 NEW_DIR_FILENAME = "nested/test.file"
 MULTI_FILENAMES = ["file1", "dir/file2"].freeze
 

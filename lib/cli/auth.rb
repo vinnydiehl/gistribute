@@ -41,9 +41,9 @@ module Gistribute
             # The user has not yet entered the code; keep waiting silently
             next
           elsif response["error"] == "expired_token"
-            exit_error(2, "Token expired! Please try again.")
+            panic! "Token expired! Please try again."
           else
-            exit_error(1, response["error_description"])
+            panic! response["error_description"]
           end
         end
 
