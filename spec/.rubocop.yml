@@ -36,5 +36,11 @@ RSpec/NestedGroups:
 RSpec/NoExpectationExample:
   Enabled: false
 
+RSpec/ScatteredLet:
+  Enabled: false
+
 RSpec/SortMetadata:
+  Enabled: false
+
+RSpec/VerifiedDoubles:
   Enabled: false

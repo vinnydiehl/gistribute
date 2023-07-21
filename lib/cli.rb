@@ -2,6 +2,7 @@
 
 require "cli/auth"
 require "cli/install"
+require "cli/upload"
 
 module Gistribute
   class CLI
@@ -9,9 +10,16 @@ module Gistribute
       @options = Optimist.options do
         version "gistribute #{File.read(File.expand_path('../VERSION', __dir__)).strip}"
         banner version
-        banner "Usage: gistribute [OPTIONS] URL_OR_ID"
+
+        banner <<~USAGE
+          \nUsage:
+            gistribute [OPTION]... URL_OR_ID
+            gistribute [OPTION]... -u FILE...
+            gistribute [OPTION]... -u DIRECTORY
+        USAGE
 
         banner "\nOptions:"
+        opt :upload, "upload a gistribution"
         opt :yes, "install files without prompting"
         opt :version, "display version number"
         opt :help, "display this message"
@@ -21,13 +29,19 @@ module Gistribute
 
       authenticate
 
-      Optimist.educate if ARGV.length != 1
+      if ARGV.empty?
+        Optimist.educate
+      end
 
-      @gist_input = ARGV.first
+      if @options.upload
+        @files = ARGV.dup
+      else
+        @gist_input = ARGV.first
+      end
     end
 
     def run
-      install
+      @options.upload ? upload : install
     end
 
     def confirm?(prompt)
@@ -37,10 +51,15 @@ module Gistribute
       input.start_with?("y") || input.empty?
     end
 
+    def get_input(prompt)
+      print prompt
+      $stdin.gets.strip
+    end
+
     # Prints an error message and exits the program.
-    def exit_error(code, message)
+    def panic!(message)
       $stderr.puts "#{'Error'.red}: #{message}"
-      exit code
+      exit 1
     end
   end
 end

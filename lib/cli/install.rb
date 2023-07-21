@@ -34,7 +34,7 @@ module Gistribute
 
         # | as path separator in the Gist's file name, as Gist doesn't allow the
         # usage of /.
-        path = metadata.last.gsub(/[~|]/, "|" => "/", "~" => Dir.home)
+        path = Gistribute.decode(metadata.last)
         # Default description is the name of the file.
         description = metadata.size == 1 ? File.basename(path) : metadata.first
 

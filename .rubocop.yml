@@ -14,9 +14,6 @@ Gemspec/RequiredRubyVersion:
 Layout/ArgumentAlignment:
   Enabled: false
 
-Layout/DotPosition:
-  Enabled: false
-
 Layout/EndAlignment:
   EnforcedStyleAlignWith: variable
 
@@ -26,8 +23,14 @@ Layout/ExtraSpacing:
 Layout/FirstHashElementIndentation:
   EnforcedStyle: consistent
 
+Layout/MultilineMethodCallIndentation:
+  EnforcedStyle: indented
+
 Layout/SpaceAroundEqualsInParameterDefault:
   Enabled: false
+
+Layout/TrailingWhitespace:
+  AllowInHeredoc: false
 
 Lint/NonDeterministicRequireOrder:
   Enabled: false
@@ -76,6 +79,9 @@ Style/NumericPredicate:
 
 Style/ParallelAssignment:
   Enabled: false
+
+Style/RequireOrder:
+  Enabled: true
 
 Style/StderrPuts:
   Enabled: false

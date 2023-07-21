@@ -2,26 +2,19 @@
 
 require "spec_helper"
 
-def args_should_trigger_help_screen(*args)
-  it "shows the help screen" do
-    set_argv(*args)
-    allow(Optimist).to receive :educate
-
-    Gistribute::CLI.new
-    expect(Optimist).to have_received :educate
-  end
-end
-
 describe Gistribute::CLI do
   before { suppress_stdout }
 
   describe "#initialize" do
     context "when no argument is provided" do
-      args_should_trigger_help_screen
-    end
+      it "shows the help screen" do
+        allow(Optimist).to receive :educate
+        # Need to call this to reset any args that have been passed to RSpec
+        set_argv
+        described_class.new
 
-    context "when there are too many args" do
-      args_should_trigger_help_screen "too", "many"
+        expect(Optimist).to have_received :educate
+      end
     end
   end
 
