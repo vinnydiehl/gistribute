@@ -119,5 +119,19 @@ describe Gistribute::CLI do
         end
       end
     end
+
+    context "with the `--yes` flag" do
+      before do
+        allow($stdout).to receive(:puts)
+
+        File.write(SINGLE_FILE_PATH, SINGLE_FILE_CONTENT)
+        simulate_user_input "Test File\n"
+        run "--upload", "--yes", SINGLE_FILE_PATH
+      end
+
+      it "uploads without prompting the user" do
+        expect(octokit_client).to have_received(:create_gist)
+      end
+    end
   end
 end
