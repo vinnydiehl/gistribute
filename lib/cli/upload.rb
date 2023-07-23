@@ -11,12 +11,12 @@ module Gistribute
 
       if confirm?("\nUpload these files? [Yn] ")
         gist = @client.create_gist description: "", public: true, files: files_json
+
+        print "Gistribution uploaded to: ".green
+        puts gist.html_url
       else
         puts "Aborted.".red
       end
-
-      print "Gistribution uploaded to: ".green
-      puts gist.html_url
     end
 
     def process_files(files)
