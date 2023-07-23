@@ -18,7 +18,7 @@ CWD_ID = "3c7006e629fcc54262ef02a5b2204735"
 HOME_ID = "acb6caa80886101a68c5c85e4c100ddb"
 
 def test_single_file(id, path)
-  before { run id }
+  before { run "install", id }
 
   # TEMP already gets `rm -rf`ed in the `cli_spec.rb` #after
   unless path == TEMP
@@ -57,7 +57,7 @@ describe Gistribute::CLI do
       end
 
       context "when given a directory that doesn't exist" do
-        before { run NON_EXISTENT_DIR_ID }
+        before { run "install", NON_EXISTENT_DIR_ID }
 
         let(:file_contents) { File.read "#{TEMP}/#{NEW_DIR_FILENAME}" }
 
@@ -67,7 +67,7 @@ describe Gistribute::CLI do
       end
 
       context "when run with a multi-file Gist" do
-        before { run MULTI_FILE_ID }
+        before { run "install", MULTI_FILE_ID }
 
         let(:file1_contents) { File.read "#{TEMP}/#{MULTI_FILENAMES[0]}" }
         let(:file2_contents) { File.read "#{TEMP}/#{MULTI_FILENAMES[1]}" }
@@ -91,7 +91,7 @@ describe Gistribute::CLI do
       context "when given a bad ID (404)" do
         before do
           %i[puts print].each { |p| allow($stderr).to receive p }
-          run "bad", fail_on_exit: false
+          run "install", "bad", fail_on_exit: false
         end
 
         it "prints the error to STDERR" do
@@ -110,7 +110,7 @@ describe Gistribute::CLI do
     context "when user inputs nothing at the installation prompt" do
       before do
         simulate_user_input "\n"
-        run PUB_SINGLE_FILE_ID
+        run "install", PUB_SINGLE_FILE_ID
       end
 
       it "saves the file" do
@@ -122,7 +122,7 @@ describe Gistribute::CLI do
       context "when user inputs `#{ch}` at the installation prompt" do
         before do
           simulate_user_input "#{ch}\n"
-          run PUB_SINGLE_FILE_ID
+          run "install", PUB_SINGLE_FILE_ID
         end
 
         it "doesn't save the file" do
@@ -132,7 +132,7 @@ describe Gistribute::CLI do
     end
 
     context "when ran with the --yes flag" do
-      before { run "--yes", PUB_SINGLE_FILE_ID }
+      before { run "install", "--yes", PUB_SINGLE_FILE_ID }
 
       let(:file_contents) { File.read "#{TEMP}/#{FILENAME}" }
 

@@ -5,7 +5,7 @@ require "fileutils"
 require "json"
 require "launchy"
 require "octokit"
-require "optimist"
+require "optimist_xl"
 
 require "cli"
 

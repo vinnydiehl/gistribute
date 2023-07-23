@@ -37,7 +37,7 @@ describe Gistribute::CLI do
 
         File.write(SINGLE_FILE_PATH, SINGLE_FILE_CONTENT)
         simulate_user_input "Test File\n", "y\n"
-        run "--upload", SINGLE_FILE_PATH
+        run "upload", SINGLE_FILE_PATH
       end
 
       let :expected_api_call do
@@ -66,7 +66,7 @@ describe Gistribute::CLI do
       before do
         File.write(HOME_FILE_PATH, SINGLE_FILE_CONTENT)
         simulate_user_input "Test File\n", "y\n"
-        run "--upload", "~/#{FILENAME}"
+        run "upload", "~/#{FILENAME}"
       end
 
       after { FileUtils.rm HOME_FILE_PATH }
@@ -99,7 +99,7 @@ describe Gistribute::CLI do
           File.write("#{TEMP}/file2", file2_content)
 
           simulate_user_input "File 1\n", "File 2\n", "y\n"
-          run "--upload", *args
+          run "upload", *args
         end
 
         let :expected_api_call do
@@ -126,7 +126,7 @@ describe Gistribute::CLI do
 
         File.write(SINGLE_FILE_PATH, SINGLE_FILE_CONTENT)
         simulate_user_input "Test File\n"
-        run "--upload", "--yes", SINGLE_FILE_PATH
+        run "upload", "--yes", SINGLE_FILE_PATH
       end
 
       it "uploads without prompting the user" do

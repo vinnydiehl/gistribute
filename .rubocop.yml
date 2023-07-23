@@ -47,6 +47,10 @@ Naming/MethodParameterName:
 Naming/VariableNumber:
   Enabled: false
 
+Security/Eval:
+  Exclude:
+    - lib/cli.rb
+
 Style/ClassAndModuleChildren:
   Enabled: false
 

@@ -49,7 +49,7 @@ module Gistribute
         #{gist_description}
       EOS
 
-      unless @options.yes
+      unless @subcommand_options.yes
         puts "Files:"
 
         files.each do |f|
@@ -58,8 +58,8 @@ module Gistribute
         end
       end
 
-      if @options.yes || confirm?("\nWould you like to install these files? [Yn] ")
-        puts unless @options.yes
+      if @subcommand_options.yes || confirm?("\nWould you like to install these files? [Yn] ")
+        puts unless @subcommand_options.yes
 
         files.each do |f|
           # Handle directories that don't exist.
@@ -69,7 +69,7 @@ module Gistribute
           # If using `--yes`, we print the path in the this string rather than
           # above with the prompt
           puts " #{'*'.green} #{f[:description]} installed#{
-            @options.yes ? " to: #{f[:path]}" : '.'
+            @subcommand_options.yes ? " to: #{f[:path]}" : '.'
           }"
         end
       else

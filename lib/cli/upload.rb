@@ -9,10 +9,10 @@ module Gistribute
         panic! "No files found, aborting."
       end
 
-      if @options.yes || confirm?("\nUpload these files? [Yn] ")
+      if @subcommand_options.yes || confirm?("\nUpload these files? [Yn] ")
         gist = @client.create_gist description: "", public: true, files: files_json
 
-        puts if @options.yes
+        puts if @subcommand_options.yes
         print "Gistribution uploaded to: ".green
         puts gist.html_url
       else

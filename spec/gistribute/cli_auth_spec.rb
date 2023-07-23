@@ -69,7 +69,7 @@ describe Gistribute::CLI do
       describe "the initial output" do
         before do
           mock_oauth_response SUCCESS_RES
-          run fail_on_exit: false
+          run "login"
         end
 
         it "prints the user code" do
@@ -91,7 +91,7 @@ describe Gistribute::CLI do
         before do
           mock_oauth_response SUCCESS_RES
           allow(Octokit::Client).to receive(:new).and_call_original
-          run fail_on_exit: false
+          run "login"
         end
 
         it "writes the token to the config file" do
@@ -108,7 +108,7 @@ describe Gistribute::CLI do
         before do
           mock_oauth_response EXPIRED_RES
           %i[puts print].each { |p| allow($stderr).to receive p }
-          run fail_on_exit: false
+          run "login", fail_on_exit: false
         end
 
         let(:error) { "#{'Error'.red}: Token expired! Please try again." }
@@ -117,6 +117,17 @@ describe Gistribute::CLI do
           expect($stderr).to have_received(:puts).with(error)
         end
       end
+    end
+  end
+
+  describe "the `logout` subcommand" do
+    before do
+      allow(File).to receive(:delete)
+      run "logout"
+    end
+
+    it "deletes the auth token" do
+      expect(File).to have_received(:delete).with(CONFIG_FILE)
     end
   end
 end

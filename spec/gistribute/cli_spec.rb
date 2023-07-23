@@ -5,15 +5,15 @@ require "spec_helper"
 describe Gistribute::CLI do
   before { suppress_stdout }
 
-  describe "#initialize" do
-    context "when no argument is provided" do
-      it "shows the help screen" do
-        allow(Optimist).to receive :educate
-        # Need to call this to reset any args that have been passed to RSpec
-        set_argv
-        described_class.new
+  %w[install upload].each do |subcmd|
+    describe "the `#{subcmd}` subcommand" do
+      context "when no argument is provided" do
+        it "shows the help screen" do
+          allow(OptimistXL).to receive(:educate).and_call_original
+          run subcmd, fail_on_exit: false
 
-        expect(Optimist).to have_received :educate
+          expect(OptimistXL).to have_received :educate
+        end
       end
     end
   end
