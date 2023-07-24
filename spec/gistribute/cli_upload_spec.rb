@@ -31,10 +31,10 @@ describe Gistribute::CLI do
   after { FileUtils.rm_rf TEMP }
 
   describe "#upload" do
+    before { allow($stdout).to receive(:puts) }
+
     context "with a single file" do
       before do
-        allow($stdout).to receive(:puts)
-
         File.write(SINGLE_FILE_PATH, SINGLE_FILE_CONTENT)
         simulate_user_input "Test File\n", "y\n"
         run "upload", SINGLE_FILE_PATH
@@ -120,10 +120,21 @@ describe Gistribute::CLI do
       end
     end
 
+    context "with the `--private` flag" do
+      before do
+        File.write(SINGLE_FILE_PATH, SINGLE_FILE_CONTENT)
+        simulate_user_input "Test File\n", "y\n"
+        run "upload", "--private", SINGLE_FILE_PATH
+      end
+
+      it "uploads a private Gist" do
+        expect(octokit_client).to have_received(:create_gist)
+          .with(a_hash_including(public: false))
+      end
+    end
+
     context "with the `--yes` flag" do
       before do
-        allow($stdout).to receive(:puts)
-
         File.write(SINGLE_FILE_PATH, SINGLE_FILE_CONTENT)
         simulate_user_input "Test File\n"
         run "upload", "--yes", SINGLE_FILE_PATH

@@ -10,7 +10,11 @@ module Gistribute
       end
 
       if @subcommand_options.yes || confirm?("\nUpload these files? [Yn] ")
-        gist = @client.create_gist description: "", public: true, files: files_json
+        gist = @client.create_gist({
+          description: "",
+          public: !@subcommand_options.private,
+          files: files_json
+        })
 
         puts if @subcommand_options.yes
         print "Gistribution uploaded to: ".green
