@@ -32,6 +32,13 @@ use the name of the file (without the path to it) as the default description.
 
 ## Usage
 
+For a detailed description of the available options, try one of the following:
+
+```sh
+gistribute upload -h
+gistribute install -h
+```
+
 ### Uploads
 
 To upload a gistribution, use the `upload` subcommand and pass in as many files
