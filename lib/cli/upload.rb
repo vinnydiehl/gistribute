@@ -11,7 +11,7 @@ module Gistribute
 
       if @subcommand_options.yes || confirm?("\nUpload these files? [Yn] ")
         gist = @client.create_gist({
-          description: "",
+          description: "[gistribution] #{@subcommand_options.description}".strip,
           public: !@subcommand_options.private,
           files: files_json
         })

@@ -42,7 +42,7 @@ describe Gistribute::CLI do
 
       let :expected_api_call do
         {
-          description: "",
+          description: "[gistribution]",
           public: true,
           files: {
             "#{SINGLE_FILE_DESC} || #{ENCODED_SINGLE_FILE_PATH}" => {
@@ -73,7 +73,7 @@ describe Gistribute::CLI do
 
       let :expected_api_call do
         {
-          description: "",
+          description: "[gistribution]",
           public: true,
           files: { "#{SINGLE_FILE_DESC} || #{ENCODED_HOME_FILE_PATH}" => { content: SINGLE_FILE_CONTENT } }
         }
@@ -104,7 +104,7 @@ describe Gistribute::CLI do
 
         let :expected_api_call do
           {
-            description: "",
+            description: "[gistribution]",
             public: true,
             files: {
               "File 1 || #{ENCODED_TEMP}|dir|file1" => { content: file1_content },
@@ -117,6 +117,19 @@ describe Gistribute::CLI do
           expect(octokit_client).to have_received(:create_gist)
             .with(expected_api_call)
         end
+      end
+    end
+
+    context "with the `--description` flag" do
+      before do
+        File.write(SINGLE_FILE_PATH, SINGLE_FILE_CONTENT)
+        simulate_user_input "Test File\n", "y\n"
+        run "upload", "--description", "foo bar", SINGLE_FILE_PATH
+      end
+
+      it "uses the given description" do
+        expect(octokit_client).to have_received(:create_gist)
+          .with(a_hash_including(description: "[gistribution] foo bar"))
       end
     end
 

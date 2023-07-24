@@ -58,7 +58,8 @@ module Gistribute
             Options:
           BANNER
 
-          opt :private, "use a private gist"
+          opt :description, "description for the Gist", type: :string
+          opt :private, "use a private Gist"
           opt :yes, "upload files without prompting"
         end
 
