@@ -122,12 +122,12 @@ describe Gistribute::CLI do
 
   describe "the `logout` subcommand" do
     before do
-      allow(File).to receive(:delete)
+      allow(FileUtils).to receive(:rm_rf)
       run "logout"
     end
 
     it "deletes the auth token" do
-      expect(File).to have_received(:delete).with(CONFIG_FILE)
+      expect(FileUtils).to have_received(:rm_rf).with(CONFIG_FILE)
     end
   end
 end

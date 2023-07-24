@@ -69,7 +69,7 @@ module Gistribute
       @subcommand, @global_options, @subcommand_options =
         @options.subcommand, @options.global_options, @options.subcommand_options
 
-      authenticate
+      authenticate unless @subcommand == "logout"
 
       case @subcommand
       when "install"
@@ -84,7 +84,8 @@ module Gistribute
       when "login"
         # Do nothing, #authenticate is run from the constructor
       when "logout"
-        File.delete CONFIG_FILE
+        FileUtils.rm_rf CONFIG_FILE
+        puts "Logged out.".green
       else
         if ARGV.empty?
           OptimistXL.educate

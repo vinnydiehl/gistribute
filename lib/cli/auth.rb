@@ -51,8 +51,14 @@ module Gistribute
       end
 
       @client = Octokit::Client.new(access_token:)
-      puts "Logged in as #{@client.user.login}."
-      puts
+
+      success_message = "Logged in as #{@client.user.login}."
+      if @subcommand == "login"
+        puts success_message.green
+      else
+        puts success_message
+        puts
+      end
     end
   end
 end
