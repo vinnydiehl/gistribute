@@ -62,6 +62,7 @@ module Gistribute
           opt :description, "description for the Gist", type: :string
           opt :private, "use a private Gist"
           opt :yes, "upload files without prompting"
+          opt :relative, "use relative file paths"
         end
 
         educate_on_error

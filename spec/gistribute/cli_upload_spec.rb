@@ -157,5 +157,44 @@ describe Gistribute::CLI do
         expect(octokit_client).to have_received(:create_gist)
       end
     end
+
+    context "with the `--relative` flag" do
+      context "with a single file" do
+        before do
+          File.write(FILENAME, SINGLE_FILE_CONTENT)
+          simulate_user_input "Test File\n", "y\n"
+          run "upload", "--relative", FILENAME
+        end
+
+        after { File.delete FILENAME }
+
+        it "uploads with a relative file path" do
+          expect(octokit_client).to have_received(:create_gist)
+            .with(a_hash_including(files: { "Test File || #{FILENAME}" => anything }))
+        end
+      end
+
+      context "with a single directory" do
+        let(:test_dir) { "test_dir" }
+
+        before do
+          FileUtils.mkdir test_dir
+          [1, 2].each { |n| FileUtils.touch "#{test_dir}/file#{n}" }
+
+          simulate_user_input "File 1\n", "File 2\n", "y\n"
+          run "upload", "--relative", test_dir
+        end
+
+        after { FileUtils.rm_rf test_dir }
+
+        it "uploads with a relative file path" do
+          expect(octokit_client).to have_received(:create_gist)
+            .with(a_hash_including(files: {
+              "File 1 || #{test_dir}|file1" => anything,
+              "File 2 || #{test_dir}|file2" => anything
+            }))
+        end
+      end
+    end
   end
 end
