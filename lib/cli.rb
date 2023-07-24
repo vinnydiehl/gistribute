@@ -45,6 +45,7 @@ module Gistribute
           BANNER
 
           opt :yes, "install files without prompting"
+          opt :force, "overwrite existing files without prompting"
         end
 
         subcmd :upload, "upload a gistribution" do

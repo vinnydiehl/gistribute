@@ -62,6 +62,12 @@ module Gistribute
         puts unless @subcommand_options.yes
 
         files.each do |f|
+          if File.exist?(f[:path]) && !@subcommand_options.force &&
+             !confirm?("File already exists: #{f[:path]}\nWould you like to overwrite it? [Yn] ")
+            puts " #{'*'.red} #{f[:description]} skipped."
+            next
+          end
+
           # Handle directories that don't exist.
           FileUtils.mkdir_p File.dirname(f[:path])
           File.write(f[:path], f[:content])

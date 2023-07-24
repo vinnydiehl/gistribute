@@ -131,6 +131,55 @@ describe Gistribute::CLI do
       end
     end
 
+    context "when a file would be overwritten" do
+      let(:orig_content) { "original" }
+
+      before do
+        FileUtils.mkdir_p "#{TEMP}/dir"
+        MULTI_FILENAMES.each do |filename|
+          File.write("#{TEMP}/#{filename}", orig_content)
+        end
+      end
+
+      let(:file1_contents) { File.read "#{TEMP}/#{MULTI_FILENAMES[0]}" }
+      let(:file2_contents) { File.read "#{TEMP}/#{MULTI_FILENAMES[1]}" }
+
+      context "when the user inputs `y` at the file overwrite prompts" do
+        before do
+          simulate_user_input "y\n", "y\n", "y\n"
+          run "install", MULTI_FILE_ID
+        end
+
+        it "downloads the files into the correct locations" do
+          expect([file1_contents, file2_contents]).not_to include orig_content
+        end
+      end
+
+      context "when the user inputs `n` at the file overwrite prompts" do
+        before do
+          simulate_user_input "y\n", "n\n", "n\n"
+          run "install", MULTI_FILE_ID
+        end
+
+        it "doesn't download the files" do
+          expect([file1_contents, file2_contents]).to all eq orig_content
+        end
+      end
+
+      context "with the `--force` flag" do
+        before do
+          simulate_user_input "y\n"
+          run "install", "--force", MULTI_FILE_ID
+        end
+
+        it "overwrites the files without prompting" do
+          [file1_contents, file2_contents].each do |result|
+            expect(result).not_to eq orig_content
+          end
+        end
+      end
+    end
+
     context "when ran with the --yes flag" do
       before { run "install", "--yes", PUB_SINGLE_FILE_ID }
 
