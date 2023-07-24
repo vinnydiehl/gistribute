@@ -4,7 +4,9 @@ require "spec_helper"
 
 describe Gistribute do
   describe "::parse_id" do
-    [PUB_SINGLE_FILE_ID, SEC_SINGLE_FILE_ID].each do |id|
+    %i[pub_single_file sec_single_file].each do |gist|
+      id = GIST_IDS[gist]
+
       [
         "https://gist.github.com/username/#{id}",
         "https://gist.github.com/#{id}",

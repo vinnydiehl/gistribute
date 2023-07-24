@@ -8,14 +8,19 @@ MULTI_FILENAMES = ["file1", "dir/file2"].freeze
 SINGLE_FILE_CONTENTS = "Line 1\nLine 2\n"
 
 # Test Gists
-PUB_SINGLE_FILE_ID = "4346763"
-SEC_SINGLE_FILE_ID = "5fa3c6bab88036e95d62cadf15128ec3"
-NO_TITLE_ID = "5865a130f9cf40acd9f0e85d15e601a7"
-NO_PIPE_SPACING_ID = "5677679b0db25054521753e5d59bed3d"
-NON_EXISTENT_DIR_ID = "8c86bf9cda921ebe7ad1bf0c46afb108"
-MULTI_FILE_ID = "8d4a2a4c8fe0b1427fed39c939857a40"
-CWD_ID = "3c7006e629fcc54262ef02a5b2204735"
-HOME_ID = "acb6caa80886101a68c5c85e4c100ddb"
+
+GIST_IDS = {
+  pub_single_file: "4346763",
+  sec_single_file: "5fa3c6bab88036e95d62cadf15128ec3",
+  no_title: "5865a130f9cf40acd9f0e85d15e601a7",
+  no_pipe_spacing: "5677679b0db25054521753e5d59bed3d",
+  non_existent_dir: "8c86bf9cda921ebe7ad1bf0c46afb108",
+  multi_file: "8d4a2a4c8fe0b1427fed39c939857a40",
+  cwd: "3c7006e629fcc54262ef02a5b2204735",
+  home: "acb6caa80886101a68c5c85e4c100ddb",
+  gist_description: "332d3f90378380a00614a088d9c179c5",
+  no_gist_description: "b35c3fcf05af11b7efc1a5dbd11d23be"
+}
 
 def test_single_file(id, path)
   before { run "install", id }
@@ -46,10 +51,10 @@ describe Gistribute::CLI do
       before { simulate_user_input "y\n" }
 
       {
-        "public single file": PUB_SINGLE_FILE_ID,
-        "secret single file": SEC_SINGLE_FILE_ID,
-        "no title": NO_TITLE_ID,
-        "no || spacing": NO_PIPE_SPACING_ID
+        "public single file": GIST_IDS[:pub_single_file],
+        "secret single file": GIST_IDS[:sec_single_file],
+        "no title": GIST_IDS[:no_title],
+        "no || spacing": GIST_IDS[:no_pipe_spacing]
       }.each do |description, id|
         context "when run with a #{description} Gist" do
           test_single_file id, TEMP
@@ -57,7 +62,7 @@ describe Gistribute::CLI do
       end
 
       context "when given a directory that doesn't exist" do
-        before { run "install", NON_EXISTENT_DIR_ID }
+        before { run "install", GIST_IDS[:non_existent_dir] }
 
         let(:file_contents) { File.read "#{TEMP}/#{NEW_DIR_FILENAME}" }
 
@@ -67,7 +72,7 @@ describe Gistribute::CLI do
       end
 
       context "when run with a multi-file Gist" do
-        before { run "install", MULTI_FILE_ID }
+        before { run "install", GIST_IDS[:multi_file] }
 
         let(:file1_contents) { File.read "#{TEMP}/#{MULTI_FILENAMES[0]}" }
         let(:file2_contents) { File.read "#{TEMP}/#{MULTI_FILENAMES[1]}" }
@@ -81,11 +86,11 @@ describe Gistribute::CLI do
       end
 
       context "when given a file for the current working directory" do
-        test_single_file CWD_ID, Dir.pwd
+        test_single_file GIST_IDS[:cwd], Dir.pwd
       end
 
       context "when given a file for the home directory" do
-        test_single_file HOME_ID, Dir.home
+        test_single_file GIST_IDS[:home], Dir.home
       end
 
       context "when given a bad ID (404)" do
@@ -105,12 +110,35 @@ describe Gistribute::CLI do
           expect($stderr).to have_received(:puts).with("bad")
         end
       end
+
+      context "when given a Gist with only a description" do
+        before { run "install", GIST_IDS[:gist_description] }
+
+        it "prints the description" do
+          expect($stdout).to have_received(:write)
+            .with(a_string_including("test description"))
+        end
+
+        it "removes the `[gistribution]` from the beginning" do
+          expect($stdout).not_to have_received(:write)
+            .with(a_string_including("[gistribution]"))
+        end
+      end
+
+      context "when given a Gist with only `[gistribution]` in the description" do
+        before { run "install", GIST_IDS[:no_gist_description] }
+
+        it "doesn't print the description" do
+          expect($stdout).not_to have_received(:write)
+            .with(a_string_including("[gistribution]"))
+        end
+      end
     end
 
     context "when user inputs nothing at the installation prompt" do
       before do
         simulate_user_input "\n"
-        run "install", PUB_SINGLE_FILE_ID
+        run "install", GIST_IDS[:pub_single_file]
       end
 
       it "saves the file" do
@@ -122,7 +150,7 @@ describe Gistribute::CLI do
       context "when user inputs `#{ch}` at the installation prompt" do
         before do
           simulate_user_input "#{ch}\n"
-          run "install", PUB_SINGLE_FILE_ID
+          run "install", GIST_IDS[:pub_single_file]
         end
 
         it "doesn't save the file" do
@@ -147,7 +175,7 @@ describe Gistribute::CLI do
       context "when the user inputs `y` at the file overwrite prompts" do
         before do
           simulate_user_input "y\n", "y\n", "y\n"
-          run "install", MULTI_FILE_ID
+          run "install", GIST_IDS[:multi_file]
         end
 
         it "downloads the files into the correct locations" do
@@ -158,7 +186,7 @@ describe Gistribute::CLI do
       context "when the user inputs `n` at the file overwrite prompts" do
         before do
           simulate_user_input "y\n", "n\n", "n\n"
-          run "install", MULTI_FILE_ID
+          run "install", GIST_IDS[:multi_file]
         end
 
         it "doesn't download the files" do
@@ -169,7 +197,7 @@ describe Gistribute::CLI do
       context "with the `--force` flag" do
         before do
           simulate_user_input "y\n"
-          run "install", "--force", MULTI_FILE_ID
+          run "install", "--force", GIST_IDS[:multi_file]
         end
 
         it "overwrites the files without prompting" do
@@ -181,7 +209,7 @@ describe Gistribute::CLI do
     end
 
     context "when ran with the --yes flag" do
-      before { run "install", "--yes", PUB_SINGLE_FILE_ID }
+      before { run "install", "--yes", GIST_IDS[:pub_single_file] }
 
       let(:file_contents) { File.read "#{TEMP}/#{FILENAME}" }
 

@@ -26,6 +26,7 @@ module Gistribute
       # check to see if it's empty- if not, put newlines on each side so that it
       # will be padded when displayed in the output.
       gist_description = gist.description.gsub(/(.{1,79})(\s+|\Z)/, "\\1\n").strip
+        .sub(/^\[gistribut(e|ion)\] ?/, "")
       gist_description = "\n#{gist_description}\n" unless gist_description.empty?
 
       # Process files
