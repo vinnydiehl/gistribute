@@ -31,7 +31,7 @@ module Gistribute
     end
 
     def process_file(file)
-      file = @subcommand_options.relative ? file : File.expand_path(file)
+      file = File.expand_path(file) unless @subcommand_options.relative
 
       if File.directory?(file)
         # Recursively process every file in the directory

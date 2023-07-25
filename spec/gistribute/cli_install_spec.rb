@@ -20,7 +20,7 @@ GIST_IDS = {
   home: "acb6caa80886101a68c5c85e4c100ddb",
   gist_description: "332d3f90378380a00614a088d9c179c5",
   no_gist_description: "b35c3fcf05af11b7efc1a5dbd11d23be"
-}
+}.freeze
 
 def test_single_file(id, path)
   before { run "install", id }
